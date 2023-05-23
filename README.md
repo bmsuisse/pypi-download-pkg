@@ -6,3 +6,8 @@ Usage: `download_linux_pkg --pkg-filter certifi --output-dir out`
 
 You do need either a requirements.txt file or use poetry with poetry beeing available in PATH. In the later case we're generating requirements.txt on the fly
 
+## Installation
+
+`pip install pypi-download-pkg` 
+
+See also https://pypi.org/project/pypi-download-pkg/
