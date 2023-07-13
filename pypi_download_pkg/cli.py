@@ -43,45 +43,43 @@ def is_linux(filename: str):
     return any((r for r in linux_regexes if re.search(r, filename)))
 
 def handle_package(pk: str, version: str, output_dir: str):
-    url = f"https://pypi.org/pypi/{pk}/json"
+    url = f"https://pypi.org/pypi/{pk}/{version}/json"
     r = requests.get(url)
     r.raise_for_status()
-    releases = r.json()["releases"]
-    for pkg_version, pkg_files in releases.items():
-        if pkg_version == version:
-            for fl in pkg_files:
-                if (
-                    fl["packagetype"] == "sdist"
-                    or fl["filename"].endswith("-none-any.whl")
-                    or is_linux(fl["filename"])
-                ):
-                    if not os.path.exists(os.path.join(output_dir, fl["filename"])):
-                        download_url = fl["url"]
-                        r = requests.get(download_url, stream=True)
-                        r.raise_for_status()
-                        os.makedirs(output_dir, exist_ok=True)
-                        with open(os.path.join(output_dir, fl["filename"]), 'wb') as f:
-                            for chunk in r.iter_content(chunk_size=1024):
-                                if chunk:
-                                    f.write(chunk)
-                        print("do " + fl["filename"])
-                    else:
-                        print("already done " + fl["filename"])
-                elif (
-                    "-macosx_" in fl["filename"]
-                    or "ppc64le." in fl["filename"]
-                    or fl["filename"].endswith("s390x.whl")
-                    or fl["filename"].endswith("win32.whl")
-                    or fl["filename"].endswith("win_amd64.whl")
-                    or fl["filename"].endswith("win_arm64.whl")
-                    or fl["filename"].endswith("win_arm32.whl")
-                    or fl["filename"].endswith("armv7l.whl")
-                    or re.search("armv[0-9]*[a-z]{0,3}.whl", fl["filename"])
-                ):
-                    print("ignoring " + fl["filename"])
-                else:
-                    print("not sure about " + fl["filename"] + ". Ignoring for now")
-                    print(fl["packagetype"])
+    pkg_files = r.json()["urls"]
+    for fl in pkg_files:
+        if (
+            fl["packagetype"] == "sdist"
+            or fl["filename"].endswith("-none-any.whl")
+            or is_linux(fl["filename"])
+        ):
+            if not os.path.exists(os.path.join(output_dir, fl["filename"])):
+                download_url = fl["url"]
+                r = requests.get(download_url, stream=True)
+                r.raise_for_status()
+                os.makedirs(output_dir, exist_ok=True)
+                with open(os.path.join(output_dir, fl["filename"]), 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=1024):
+                        if chunk:
+                            f.write(chunk)
+                print("do " + fl["filename"])
+            else:
+                print("already done " + fl["filename"])
+        elif (
+            "-macosx_" in fl["filename"]
+            or "ppc64le." in fl["filename"]
+            or fl["filename"].endswith("s390x.whl")
+            or fl["filename"].endswith("win32.whl")
+            or fl["filename"].endswith("win_amd64.whl")
+            or fl["filename"].endswith("win_arm64.whl")
+            or fl["filename"].endswith("win_arm32.whl")
+            or fl["filename"].endswith("armv7l.whl")
+            or re.search("armv[0-9]*[a-z]{0,3}.whl", fl["filename"])
+        ):
+            print("ignoring " + fl["filename"])
+        else:
+            print("not sure about " + fl["filename"] + ". Ignoring for now")
+            print(fl["packagetype"])
 
 def execute(req_file: str, pkg_filter: Optional[List[str]], output_dir: str):
     if pkg_filter and len(pkg_filter) == 0:
