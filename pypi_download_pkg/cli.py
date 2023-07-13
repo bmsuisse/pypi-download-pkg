@@ -57,11 +57,13 @@ def handle_package(pk: str, version: str, output_dir: str):
                 ):
                     if not os.path.exists(os.path.join(output_dir, fl["filename"])):
                         download_url = fl["url"]
-                        r = requests.get(download_url)
+                        r = requests.get(download_url, stream=True)
                         r.raise_for_status()
                         os.makedirs(output_dir, exist_ok=True)
                         with open(os.path.join(output_dir, fl["filename"]), 'wb') as f:
-                            f.write(r.content)
+                            for chunk in r.iter_content(chunk_size=1024):
+                                if chunk:
+                                    f.write(chunk)
                         print("do " + fl["filename"])
                     else:
                         print("already done " + fl["filename"])
