@@ -26,12 +26,13 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.x'
-    - name: Install dependencies
+    - name: Install Uv
       run: |
         python -m pip install --upgrade pip
-        pip install poetry
-        poetry install --all-extras
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    - name: Install Dependencies
+      run: uv sync --all-groups --all-extras
     - name: Build package
-      run: poetry build
+      run: uv build
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
