@@ -11,7 +11,7 @@
             "module": "pypi_download_pkg.cli",
             "justMyCode": true,
             "args": [
-                "--pkg-filter", "cryptography", "-r", "tests/test_data/requirements.txt", "--output-dir", "test_output"
+                "--pkg-filter", "bcrypt", "-r", "tests/test_data/requirements.txt", "--output-dir", "test_output"
             ]
         }
     ]

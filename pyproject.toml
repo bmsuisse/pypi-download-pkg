@@ -1,6 +1,6 @@
 [project]
 name = "pypi-download-pkg"
-version = "0.2.2"
+version = "0.2.4"
 description = ""
 authors = []
 dependencies = [
@@ -25,12 +25,6 @@ testpaths = [
 [tool.uv]
 native-tls = true
 keyring-provider = "subprocess"
-
-[[tool.uv.index]]
-name = "BMSAzureDevOps"
-url = "https://VssSessionToken@pkgs.dev.azure.com/bmeurope/_packaging/BMS/pypi/simple/"
-explicit = true
-publish-url = "https://pkgs.dev.azure.com/bmeurope/_packaging/BMS/pypi/upload/"
 
 [tool.hatch.build.targets.wheel]
 packages = [

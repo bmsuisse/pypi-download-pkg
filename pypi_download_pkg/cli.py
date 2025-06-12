@@ -8,7 +8,7 @@ def get_deps(req_file: str):
     def parse_file(f):
         l = f.readline()
         while l is not None and l != "":
-            if l and not l.strip().startswith("--"):
+            if l and not l.strip().startswith("--") and not l.strip().startswith("#"):
                 pkg, version = l.split(";")[0].split("==")
                 if "[" in pkg:
                     pkg = pkg[0 : pkg.index("[")]
@@ -21,7 +21,7 @@ def get_deps(req_file: str):
         else:
             import subprocess
             import io
-            output = subprocess.run("poetry export -f requirements.txt --without-urls --without-hashes", stdout=subprocess.PIPE).stdout.decode("utf-8")
+            output = subprocess.run("uv export --no-hashes --no-annotate", stdout=subprocess.PIPE).stdout.decode("utf-8")
             with io.StringIO(output) as iof:
                 for i in parse_file(iof):
                     yield i
