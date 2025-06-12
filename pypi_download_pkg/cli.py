@@ -87,12 +87,24 @@ def execute(req_file: str, pkg_filter: Optional[List[str]], output_dir: str):
 
     done_any = False
     all_deps = []
-    for pkg, version in get_deps(req_file):
-        all_deps.append(pkg)
-        if pkg_filter and not pkg in pkg_filter:
-            continue
-        done_any = True
-        handle_package(pkg, version, output_dir)
+    vs = []
+    if pkg_filter is not None:
+        for p in pkg_filter:
+            if "==" in p:
+                pkg, version = p.split("==")
+                vs.append((pkg, version))
+        pkg_filter = [p for p in pkg if "==" not in p]
+    if vs:
+        for pkg, version in vs:
+            done_any = True
+            handle_package(pkg, version, output_dir)
+    if not vs or pkg_filter:
+        for pkg, version in get_deps(req_file):
+            all_deps.append(pkg)
+            if pkg_filter and not pkg in pkg_filter:
+                continue
+            done_any = True
+            handle_package(pkg, version, output_dir)
     if not done_any and pkg_filter is not None:
         print("Could not find package: " + ", " .join(pkg_filter))
         print("Can be any of : " + ", ".join(all_deps))
